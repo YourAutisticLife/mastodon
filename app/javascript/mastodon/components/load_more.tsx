@@ -3,13 +3,15 @@ import { FormattedMessage } from 'react-intl';
 import { LoadingIndicator } from './loading_indicator';
 
 interface Props {
-  onClick: (event: React.MouseEvent) => void;
+  onMouseDown: (event: React.MouseEvent) => void;
+  onMouseUp: (event: React.MouseEvent) => void;
   disabled?: boolean;
   visible?: boolean;
   loading?: boolean;
 }
 export const LoadMore: React.FC<Props> = ({
-  onClick,
+  onMouseDown,
+  onMouseUp,
   disabled,
   visible = true,
   loading = false,
@@ -20,7 +22,8 @@ export const LoadMore: React.FC<Props> = ({
       className='load-more'
       disabled={disabled || loading || !visible}
       style={{ visibility: visible ? 'visible' : 'hidden' }}
-      onClick={onClick}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
     >
       {loading ? (
         <LoadingIndicator />
