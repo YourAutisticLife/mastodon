@@ -89,7 +89,7 @@ class ScrollableList extends PureComponent {
   };
 
   intersectionObserverWrapper = new IntersectionObserverWrapper();
-  firstSeenArticle = null;
+  articleOfInterest = null;
   scrollAdjustment = 0;
 
   handleScroll = throttle(() => {
@@ -234,7 +234,7 @@ class ScrollableList extends PureComponent {
   };
 
   preLoad = () => {
-    // Here we record the first visible article so that when we mouseUp on
+    // Here we record the article of interest so that when we mouseUp on
     // the LoadX element, were able to scroll back to it.
 
     // Note that it does not matter whether we are binding to the document, or
@@ -244,27 +244,40 @@ class ScrollableList extends PureComponent {
     for (const article of articles) {
       const articleRect = article.getBoundingClientRect();
       if (articleRect.top >= scrollableRect.top) {
-        this.firstSeenArticle = article;
+        this.articleOfInterest = article;
         break;
       }
     }
   }
 
-  returnToFirstArticle () {
-    const first = this.firstSeenArticle;
-    if (first === null) {
+  returnToArticleOfInterest () {
+    let article = this.articleOfInterest;
+    if (article === null) {
       return;
     }
 
-    // Scroll the firstSeenArticle back into view once we're done with
+    // Scroll the articleOfInterest back into view once we're done with
     // everything else.
     setTimeout(() => {
+      // We try to find the article previous to the article of interest in the
+      // list of articles. That's the article we finally want to focus on.
+      let prev = article.previousElementSibling;
+      while (prev !== null) {
+        if (prev.localName === "article") {
+          article = prev;
+          break;
+        }
+
+        prev = prev.previousElementSibling;
+      }
+
+
       // We need to adjust with the scrollAdjustment. It is non-zero only when
       // we bind to the document.
       this.setScrollTop(this.getScrollTop() +
-                        first.getBoundingClientRect().top -
+                        article.getBoundingClientRect().top -
                         this.scrollAdjustment);
-      first.querySelector("div.status__wrapper").focus();
+      article.querySelector("div.status__wrapper").focus();
     }, 0);
   }
 
@@ -272,13 +285,13 @@ class ScrollableList extends PureComponent {
   handleLoadMore = e => {
     e.preventDefault();
     this.props.onLoadMore();
-    this.returnToFirstArticle();
+    this.returnToArticleOfInterest();
   };
 
   handleLoadPending = e => {
     e.preventDefault();
     this.props.onLoadPending();
-    this.returnToFirstArticle();
+    this.returnToArticleOfInterest();
   };
 
   render () {
