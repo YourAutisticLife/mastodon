@@ -320,8 +320,7 @@ class ScrollableList extends PureComponent {
     } else if (isLoading || childrenCount > 0 || numPending > 0 || hasMore || !emptyMessage) {
       scrollableArea = (
         <div className={classNames('scrollable', { fullscreen })} ref={this.setRef}>
-          <div role='feed' className='item-list'>
-            {prepend}
+          {prepend}
 
           <div role='feed' className={classNames('item-list', className)}>
             {loadPending}
